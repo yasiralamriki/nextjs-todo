@@ -11,7 +11,7 @@ export default function Home() {
             <h1 className="text-3xl font-bold text-foreground">To-Do List</h1>
             <CreateTaskButton />
           </div>
-          <ScrollArea className="flex flex-col w-full bg-card rounded-sm p-4 items-left text-left flex-1 overflow-hidden">
+          <ScrollArea className="flex flex-col w-full bg-card rounded-sm p-6 items-left text-left flex-1 overflow-hidden">
             <TaskList />
           </ScrollArea>
         </main>
