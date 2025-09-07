@@ -13,115 +13,124 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus, Trash2 } from "lucide-react"
+import { Copy, Plus, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { useTasks } from "./TaskContext"
 
 function CreateTaskButton() {
-    const { addTask } = useTasks();
-    const [taskName, setTaskName] = useState("");
-    const [isOpen, setIsOpen] = useState(false);
+  const { addTask } = useTasks();
+  const [taskName, setTaskName] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        if (taskName.trim()) {
-            await addTask(taskName);
-            setTaskName("");
-            setIsOpen(false);
-        }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (taskName.trim()) {
+      await addTask(taskName);
+      setTaskName("");
+      setIsOpen(false);
     }
+  }
 
-    return (
-        <>
-            <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogTrigger asChild>
-                    <Button
-                        variant="outline"
-                        className="cursor-pointer"
-                    >
-                        <Plus />
-                        Create Task
-                    </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <DialogHeader>
-                            <DialogTitle>Create a new task</DialogTitle>
-                            <DialogDescription>
-                                Fill in the details for your new task.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="name-1">Name</Label>
-                                <Input
-                                    id="name-1"
-                                    name="name"
-                                    value={taskName}
-                                    onChange={e => setTaskName(e.target.value)}
-                                    placeholder="Enter task name"
-                                />
-                            </div>
-                        </div>
-                        <DialogFooter className="space-x-2">
-                            <DialogClose asChild>
-                                <Button variant="outline" type="button" className="cursor-pointer">Cancel</Button>
-                            </DialogClose>
-                            <Button type="submit" disabled={taskName.length === 0} className="cursor-pointer">Create</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-        </>
-    );
+  return (
+    <>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button
+            variant="outline"
+            className="cursor-pointer"
+          >
+            <Plus />
+            Create Task
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <DialogHeader>
+              <DialogTitle>Create a new task</DialogTitle>
+              <DialogDescription>
+                Fill in the details for your new task.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name-1">Name</Label>
+                <Input
+                  id="name-1"
+                  name="name"
+                  value={taskName}
+                  onChange={e => setTaskName(e.target.value)}
+                  placeholder="Enter task name"
+                />
+              </div>
+            </div>
+            <DialogFooter className="space-x-2">
+              <DialogClose asChild>
+                <Button variant="outline" type="button" className="cursor-pointer">Cancel</Button>
+              </DialogClose>
+              <Button type="submit" disabled={taskName.length === 0} className="cursor-pointer">Create</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 function TaskCard({ id, name }: { id: number; name: string }) {
-    const { deleteTask } = useTasks();
+  const { addTask, deleteTask } = useTasks();
 
-    async function handleDelete() {
-        await deleteTask(id);
-    }
+  async function handleAdd() {
+    await addTask(name);
+  }
 
-    return (
-        <div className="flex flex-row bg-secondary rounded-sm p-4 items-center justify-between w-full">
-            <h1 className="text-lg secondary-foreground">{name}</h1>
-            <Button variant="destructive" size="icon" className="cursor-pointer" onClick={() => handleDelete()}>
-                <Trash2 />
-            </Button>
-        </div>
-    )
+  async function handleDelete() {
+    await deleteTask(id);
+  }
+
+  return (
+    <div className="flex flex-row bg-secondary rounded-sm p-4 items-center justify-between w-full">
+      <h1 className="text-lg secondary-foreground">{name}</h1>
+      <div className="flex flex-row gap-2">
+        <Button variant="ghost" size="icon" className="cursor-pointer hover:!bg-destructive duration-300" onClick={() => handleDelete()}>
+          <Trash2 />
+        </Button>
+        <Button variant="ghost" size="icon" className="cursor-pointer hover:!bg-primary hover:!text-secondary duration-300" onClick={() => handleAdd()}>
+          <Copy />
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 function TaskList() {
-    const { tasks, loading } = useTasks();
+  const { tasks, loading } = useTasks();
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center w-full p-8">
-                <p>Loading tasks...</p>
-            </div>
-        );
-    }
-
-    if (tasks.length === 0) {
-        return (
-            <div className="flex justify-center items-center w-full p-8">
-                <p className="text-muted-foreground">No tasks yet. Create your first task!</p>
-            </div>
-        );
-    }
-
+  if (loading) {
     return (
-        <div className="flex flex-col w-full gap-6">
-            {tasks.map((task: { id: number; name: string }) => (
-                <TaskCard key={task.id} id={task.id} name={task.name} />
-            ))}
-        </div>
+      <div className="flex justify-center items-center w-full h-full p-8">
+        <p>Loading tasks...</p>
+      </div>
     );
+  }
+
+  if (tasks.length === 0) {
+    return (
+      <div className="flex justify-center items-center w-full h-full p-8">
+        <p className="text-muted-foreground">No tasks yet. Create your first task!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col w-full gap-6 h-full overflow-y-auto">
+      {tasks.map((task: { id: number; name: string }) => (
+        <TaskCard key={task.id} id={task.id} name={task.name} />
+      ))}
+    </div>
+  );
 }
 
 export { 
-    CreateTaskButton,
-    TaskList
+  CreateTaskButton,
+  TaskList
 };
