@@ -41,3 +41,25 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create task' }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { id } = await request.json();
+    
+    // Read current tasks
+    const fileContents = await fs.readFile(tasksFilePath, 'utf8');
+    const data = JSON.parse(fileContents);
+    
+    // Find and remove the task
+    const updatedTasks = data.tasks.filter((t: any) => t.id !== id);
+    data.tasks = updatedTasks;
+    
+    // Write back to file
+    await fs.writeFile(tasksFilePath, JSON.stringify(data, null, 4));
+    
+    return NextResponse.json({ id });
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    return NextResponse.json({ error: 'Failed to delete task' }, { status: 500 });
+  }
+}

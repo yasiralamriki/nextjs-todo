@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Plus } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { useTasks } from "./TaskContext"
 
@@ -76,10 +76,19 @@ function CreateTaskButton() {
     );
 }
 
-function TaskCard({ name }: { name: string }) {
+function TaskCard({ id, name }: { id: number; name: string }) {
+    const { deleteTask } = useTasks();
+
+    async function handleDelete() {
+        await deleteTask(id);
+    }
+
     return (
         <div className="flex flex-row bg-secondary rounded-sm p-4 items-center justify-between w-full">
             <h1 className="text-lg secondary-foreground">{name}</h1>
+            <Button variant="destructive" size="icon" className="cursor-pointer" onClick={() => handleDelete()}>
+                <Trash2 />
+            </Button>
         </div>
     )
 }
@@ -106,7 +115,7 @@ function TaskList() {
     return (
         <div className="flex flex-col w-full gap-6">
             {tasks.map((task: { id: number; name: string }) => (
-                <TaskCard key={task.id} name={task.name} />
+                <TaskCard key={task.id} id={task.id} name={task.name} />
             ))}
         </div>
     );

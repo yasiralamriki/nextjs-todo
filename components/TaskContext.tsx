@@ -10,6 +10,7 @@ interface Task {
 interface TaskContextType {
   tasks: Task[];
   addTask: (name: string) => Promise<void>;
+  deleteTask: (id: number) => Promise<void>;
   refreshTasks: () => Promise<void>;
   loading: boolean;
 }
@@ -54,6 +55,25 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const deleteTask = async (id: number) => {
+    try {
+      const response = await fetch('/api/tasks', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (response.ok) {
+        const { id: deletedId } = await response.json();
+        setTasks(prev => prev.filter(task => task.id !== deletedId));
+      }
+    } catch (error) {
+      console.error('Error deleting task:', error);
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -62,6 +82,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     <TaskContext.Provider value={{ 
       tasks, 
       addTask, 
+      deleteTask,
       refreshTasks: fetchTasks, 
       loading 
     }}>
